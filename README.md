@@ -2,17 +2,17 @@
 
 A FreeSWITCH module that streams L16 audio from a channel to Urai's voice agent service.
 
-### About
+## About
 
 - The purpose of `mod_urai` was to provide a simple, low-dependency yet effective module for streaming audio and receiving responses from a websocket server.
 
-## License
+### License
 
 The FreeSWITCH configuration files (`.xml`) and Lua scripts (`.lua`) in this repository are licensed under the Apache License, Version 2.0. You can find a copy of the license in the `LICENSE` file.
 
 However, the `mod_urai` FreeSWITCH module itself, which is distributed as a binary `.deb` package, is commercial software and is not covered by the Apache License. Please contact Urai AI Corp for licensing details regarding `mod_urai`.
 
-## Installation
+### Installation
 
 ### Dependencies
 
@@ -38,15 +38,7 @@ There are three extensions configured:
 
 ### How it works
 
-When a call is routed to extension `7777` or `9999`, the `agent_handler.lua` script is executed. This script is responsible for managing the call and interacting with `mod_urai`.
-
-The `mod_urai` module handles the WebSocket connection lifecycle. It streams audio from the caller to the Urai voice agent and receives commands back. When `mod_urai` receives a command to play audio, it fires a custom FreeSWITCH event (`mod_urai::play`).
-
-The `agent_handler.lua` script listens for these events. When it catches a `mod_urai::play` event, it executes a `playback` command to play the specified audio file to the caller.
-
-This architecture decouples the WebSocket communication (handled by `mod_urai`) from the call control logic (handled by `agent_handler.lua`).
-
-Here is a diagram visualizing the flow:
+Here is a diagram vizualizing how it works.
 
 ```mermaid
 sequenceDiagram
@@ -67,3 +59,18 @@ sequenceDiagram
     agent_handler.lua->>FreeSWITCH: Executes playback command
     FreeSWITCH->>Caller: Plays audio
 ```
+
+#### Explanation
+
+When a call is routed to extension `7777` or `9999`, the `agent_handler.lua` script is executed. This script is responsible for managing the call and interacting with `mod_urai`.
+
+The `mod_urai` module handles the WebSocket connection lifecycle. It streams audio from the caller to the Urai voice agent and receives commands back. When `mod_urai` receives a command to play audio, it fires a custom FreeSWITCH event (`mod_urai::play`).
+
+The `agent_handler.lua` script listens for these events. When it catches a `mod_urai::play` event, it executes a `playback` command to play the specified audio file to the caller.
+
+This architecture decouples the WebSocket communication (handled by `mod_urai`) from the call control logic (handled by `agent_handler.lua`).
+
+### Contact Us
+
+Visit [https://uraiai.com/](uraiai.com) to know more.
+
