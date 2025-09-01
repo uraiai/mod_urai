@@ -1,0 +1,65 @@
+name: Manual DEB Release from Tag
+
+# This allows you to run this workflow manually from the Actions tab
+on:
+  workflow_dispatch:
+    # Adds an input field to the manual trigger form
+    inputs:
+      private_repo_tag:
+        description: 'The git tag to check out from the private repo (e.g., v1.2.3)'
+        required: true
+        type: string
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Needed to create the release
+
+    steps:
+      # Step 1: Check out the public repository (where this workflow runs)
+      - name: Checkout Public Repo
+        uses: actions/checkout@v4.1.7
+
+      # Step 2: Check out the private C++ module repository using the specified tag
+      - name: Checkout Private Repo
+        uses: actions/checkout@v4.1.7
+        with:
+          repository: uraiai/mod_urai_private
+          path: mod_urai_private
+          token: ${{ secrets.PRIVATE_REPO_PAT }}
+          # This uses the tag you entered in the text box when running the workflow
+          ref: ${{ github.event.inputs.private_repo_tag }}
+
+      # Step 3: Set up Docker Buildx for advanced build capabilities
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3.11.0
+
+      # Step 4: Build the .deb file from the private module's code with caching
+      - name: Build DEB Package
+        uses: docker/build-push-action@v6.18.0
+        with:
+          context: mod_urai_private
+          file: mod_urai_private/docker/freeswitch-1.10-debian12-builder.dockerfile
+          load: true # Load the image into the local Docker daemon
+          tags: mod-urai-builder:latest
+          build-args: |
+            SIGNALWIRE_TOKEN=${{secrets.SIGNALWIRE_TOKEN}}
+          # Enable caching to speed up subsequent builds
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      # Step 5: Extract the .deb file from the built Docker image
+      - name: Extract DEB package
+        run: |
+          mkdir -p mod_urai_private/packages
+          docker run --rm -v $(pwd)/mod_urai_private/packages:/output mod-urai-builder:latest
+
+      # Step 6: Create a GitHub Release and upload the .deb file
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2.0.6
+        with:
+          # Use the input tag for the release name and tag on the public repo
+          name: Release ${{ github.event.inputs.private_repo_tag }}
+          tag_name: ${{ github.event.inputs.private_repo_tag }}
+          files: mod_urai_private/packages/*

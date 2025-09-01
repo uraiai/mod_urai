@@ -1,0 +1,39 @@
+<profile name="internal">
+  <gateways></gateways>
+  <aliases></aliases>
+  <domains>
+    <domain name="all" alias="true" parse="false"/>
+  </domains>
+  <settings>
+    <param name="user-agent-string" value="Minimal FreeSWITCH"/>
+    <param name="debug" value="0"/>
+    <param name="sip-ip" value="$${tailscale_ip}"/>
+    <param name="rtp-ip" value="$${tailscale_ip}"/>
+    <param name="sip-port" value="5060"/>
+    <param name="ext-sip-ip" value="$${tailscale_domain}"/>
+    <param name="ext-rtp-ip" value="$${tailscale_domain}"/>
+    <param name="dialplan" value="XML"/>
+    <param name="context" value="default"/>
+    <param name="auth-calls" value="false"/>
+    <param name="auth-subscriptions" value="true"/>
+    <param name="log-auth-failures" value="yes"/>
+    <param name="apply-inbound-acl" value="domains"/>
+    <param name="local-network-acl" value="localnet.auto"/>
+    <param name="record-path" value="$${recordings_dir}"/>
+    <param name="record-template" value="${caller_id_number}.${target_domain}.${strftime(%Y-%m-%d-%H-%M-%S)}.wav"/>
+    <param name="manage-presence" value="true"/>
+    <param name="presence-hosts" value="$${domain},$${local_ip_v4}"/>
+    <param name="presence-privacy" value="$${presence_privacy}"/>
+    <param name="inbound-codec-negotiation" value="generous"/>
+    <param name="nonce-ttl" value="60"/>
+    <param name="ext-rtp-ip" value="$${tailscale_domain}"/>
+    <param name="ext-sip-ip" value="$${tailscale_domain}"/>
+
+    <!--all inbound reg will look in this domain for the users -->
+    <param name="force-register-domain" value="$${domain}"/>
+    <!--force the domain in subscriptions to this value -->
+    <param name="force-subscription-domain" value="$${domain}"/>
+    <!--all inbound reg will stored in the db using this domain -->
+    <param name="force-register-db-domain" value="$${domain}"/>
+  </settings>
+</profile>

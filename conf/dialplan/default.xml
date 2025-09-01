@@ -1,0 +1,29 @@
+<include>
+  <context name="default">
+    <extension name="echo_demo">
+      <condition field="destination_number" expression="^8888$">
+        <action application="answer"/>
+        <action application="log" data="INFO Starting audio stream for call to 8888"/>
+        <action application="echo"/>
+      </condition>
+    </extension>
+    <extension name="remote_agent">
+      <condition field="destination_number" expression="^7777$">
+          <!-- <action application="lua" data="agent_handler.lua wss://20757db9c011.ngrok-free.app/api/v1/freeswitch/ws/d2223f47-58f4-409f-b980-aae5c7f966bb"/> -->
+          <action application="answer"/>
+          <action application="set" data="urai_api_key=$${urai_remote_api_key}"/>
+          <!-- <action application="lua" data="agent_handler.lua ws://localhost:4545/api/v1/freeswitch/ws/d2223f47-58f4-409f-b980-aae5c7f966bb"/> -->
+          <action application="lua" data="agent_handler.lua wss://urai-voice-web-832944830745.northamerica-northeast2.run.app/api/v1/freeswitch/ws/b23009cf-e0f6-45d7-8a27-0e16feadd30b"/>
+      </condition>
+    </extension>
+    <extension name="agent">
+      <condition field="destination_number" expression="^9999$">
+          <!-- <action application="lua" data="agent_handler.lua wss://20757db9c011.ngrok-free.app/api/v1/freeswitch/ws/d2223f47-58f4-409f-b980-aae5c7f966bb"/> -->
+          <action application="answer"/>
+          <action application="set" data="urai_api_key=$${urai_api_key}"/>
+          <action application="lua" data="agent_handler.lua ws://localhost:4545/api/v1/freeswitch/ws/d2223f47-58f4-409f-b980-aae5c7f966bb"/>
+          <!-- <action application="lua" data="agent_handler.lua wss://urai-voice-web-832944830745.northamerica-northeast2.run.app/api/v1/freeswitch/ws/b23009cf-e0f6-45d7-8a27-0e16feadd30b"/> -->
+      </condition>
+    </extension>
+  </context>
+</include>

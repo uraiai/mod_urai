@@ -1,0 +1,17 @@
+<include>
+  <X-PRE-PROCESS cmd="set" data="default_password=changeme"/>
+  <X-PRE-PROCESS cmd="set" data="global_codec_prefs=OPUS,G722,PCMU,PCMA,H264,VP8"/>
+  <X-PRE-PROCESS cmd="set" data="outbound_codec_prefs=OPUS,G722,PCMU,PCMA,H264,VP8"/>
+  <!-- You can set the IP address to bind to here -->
+  <!-- These values are read from environment variables -->
+  <!-- Example: docker run -e TAILSCALE_IP=100.x.x.x -e TAILSCALE_DOMAIN=my.domain.ts.net ... -->
+  <X-PRE-PROCESS cmd="set" data="tailscale_ip=100.74.246.41"/>
+  <X-PRE-PROCESS cmd="set" data="domain=magrathea.tail47f277.ts.net"/>
+  <X-PRE-PROCESS cmd="set" data="tailscale_domain=magrathea.tail47f277.ts.net"/>
+  <X-PRE-PROCESS cmd="set" data="local_ip_v4=$${tailscale_ip}"/>
+  <X-PRE-PROCESS cmd="set" data="outbound_caller_name=FreeSWITCH"/>
+  <X-PRE-PROCESS cmd="set" data="outbound_caller_id=0000000000"/>
+  <X-PRE-PROCESS cmd="set" data="hold_music=local_stream://moh"/>
+  <X-PRE-PROCESS cmd="set" data="urai_remote_api_key=long_api_key"/>
+  <X-PRE-PROCESS cmd="set" data="urai_api_key=long_api_key"/>
+</include>
