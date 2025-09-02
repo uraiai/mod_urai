@@ -18,6 +18,7 @@ if state == "CS_EXECUTE" then
   session:sleep(100)
 end
 
+
 -- Load dkjson library
 local json = require("dkjson")
 if not json then
@@ -26,7 +27,6 @@ if not json then
   return
 end
 
-freeswitch.consoleLog("INFO", "agent_handler.lua: Starting for session " .. uuid .. "\n")
 
 -- Start the audio stream
 local metadata = json.encode({
@@ -42,7 +42,6 @@ session:setVariable("STREAM_EXTRA_HEADERS", headers)
 
 -- The metadata must be passed as a string with escaped quotes for the API command
 local cmd_args = string.format("uuid_audio_stream %s start %s mono 16k '%s'", uuid, ws_url, metadata)
-session:consoleLog("INFO", "agent_handler.lua: Executing command: uuid_audio_stream " .. cmd_args .. "\n")
 local api = freeswitch.API()
 local res = api:executeString(cmd_args)
 
@@ -52,24 +51,38 @@ if not string.find(res, "+OK") then
   return
 end
 
+
 -- Use a non-blocking event consumer approach
 local con = freeswitch.EventConsumer()
 con:bind("custom", "mod_urai::play")
+con:bind("custom", "mod_urai::message")
 
+-- Instead of blocking the main thread, use a very short timeout and yield control
 while session:ready() do
   local event = con:pop(1, 100)
   if event ~= nil then
       if event:getHeader("Event-Name")=="CUSTOM" and event:getHeader("Event-Subclass")=="mod_urai::play" then
           local event_uuid = event:getHeader("Unique-ID")
-          -- uncomment for debugging
-          -- freeswitch.consoleLog("INFO", "agent_handler.lua: Received playback event for " .. event_uuid .. " uuid - " .. uuid .. "\n")
           if event_uuid == uuid then
               local body = event:getBody()
-              -- uncomment for debugging
-              -- freeswitch.consoleLog("DEBUG", "agent_handler.lua: Playing " .. body .. " for " .. uuid .. "\n")
               session:execute("playback", body)
           end
       end
+      if event:getHeader("Event-Name")=="CUSTOM" and event:getHeader("Event-Subclass")=="mod_urai::message" then
+          local event_uuid = event:getHeader("Unique-ID")
+          if event_uuid == uuid then
+            local body = event:getBody()
+            local obj, _pos, err = json.decode(body, 1, nil)
+            if err then
+              freeswitch.consoleLog("INFO", "agent_handler.lua: Unable to decode body for  " .. event_uuid .. " with message: " .. body .. "\n")
+            else
+                if obj['event']=='clear' then
+                    local api = freeswitch.API()
+                    local res = api:executeString("uuid_break " .. uuid .. " all")
+                end
+            end
+          end
+      end
   end
-  session:sleep(50)
+  session:sleep(50)  -- Sleep for 50ms to allow audio frame processing
 end

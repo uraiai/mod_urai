@@ -9,6 +9,7 @@
     <load module="mod_loopback"/>
     <load module="mod_commands"/>
     <load module="mod_conference"/>
+    <load module="mod_opus"/>
     <load module="mod_dptools"/>
     <load module="mod_dialplan_xml"/>
     <load module="mod_b64"/>
