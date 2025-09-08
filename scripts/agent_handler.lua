@@ -90,6 +90,16 @@ while session:ready() do
                 if err then
                     freeswitch.consoleLog("DEBUG", "agent_handler.lua: Unable to decode message body: " .. body .. "\n")
                 else
+                    -- Handle transfer command
+                    if obj['type']=='transfer' and obj['destination'] then
+                        local dest = obj['destination']
+                        freeswitch.consoleLog("INFO", "agent_handler.lua: Received transfer command to " .. dest .. " for " .. uuid .. "\n")
+                        -- stop streaming and transfer
+                        session:execute("transfer", dest .. " XML default")
+                        api.executeString("uuid_audio_stream " .. uuid .. " stop")
+                        -- After transfer, exit the loop
+                        break
+                    end
                     -- Handle any additional message-based clear events (fallback)
                     if obj['event']=='clear' or obj['type']=='clear' or obj['type']=='interrupt' then
                         freeswitch.consoleLog("INFO", "agent_handler.lua: Received clear command via message for " .. uuid .. "\n")
