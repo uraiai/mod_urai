@@ -100,6 +100,13 @@ while session:ready() do
                         -- After transfer, exit the loop
                         break
                     end
+                    -- Handle transfer command
+                    if obj['type']=='hangup' then
+                        api.executeString("uuid_audio_stream " .. uuid .. " stop")
+                        session:hangup()
+                        -- After transfer, exit the loop
+                        break
+                    end
                     -- Handle any additional message-based clear events (fallback)
                     if obj['event']=='clear' or obj['type']=='clear' or obj['type']=='interrupt' then
                         freeswitch.consoleLog("INFO", "agent_handler.lua: Received clear command via message for " .. uuid .. "\n")
