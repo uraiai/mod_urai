@@ -95,14 +95,15 @@ while session:ready() do
                         local dest = obj['destination']
                         freeswitch.consoleLog("INFO", "agent_handler.lua: Received transfer command to " .. dest .. " for " .. uuid .. "\n")
                         -- stop streaming and transfer
+                        session:setVariable("STREAM_NO_HANGUP_ON_CLOSE", "true")
+                        api:executeString("uuid_audio_stream " .. uuid .. " stop")
                         session:execute("transfer", dest .. " XML default")
-                        api.executeString("uuid_audio_stream " .. uuid .. " stop")
                         -- After transfer, exit the loop
                         break
                     end
                     -- Handle transfer command
                     if obj['type']=='hangup' then
-                        api.executeString("uuid_audio_stream " .. uuid .. " stop")
+                        api:executeString("uuid_audio_stream " .. uuid .. " stop")
                         session:hangup()
                         -- After transfer, exit the loop
                         break
